@@ -12,6 +12,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -119,6 +122,8 @@ fun HikariScreen(viewModel: LightViewModel = viewModel()) {
                     .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(16.dp))
                     // パネル内の余白などのタップはここで消費し、背面の表示切替に届かせない。
                     .pointerInput(Unit) { detectTapGestures { } }
+                    // 横向きでカットアウトにパネルが重ならないよう、安全な領域に収める。
+                    .windowInsetsPadding(WindowInsets.displayCutout)
                     .padding(horizontal = 20.dp, vertical = 12.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
