@@ -12,15 +12,15 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.displayCutout
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.IconButton
@@ -114,39 +114,44 @@ fun HikariScreen(viewModel: LightViewModel = viewModel()) {
             ) { viewModel.onToggleUi() },
     ) {
         if (state.uiVisible) {
-            Column(
+            // パネルの配置領域だけをカットアウトの内側に寄せる（背景の全面表示には触れない）。
+            Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(16.dp))
-                    // パネル内の余白などのタップはここで消費し、背面の表示切替に届かせない。
-                    .pointerInput(Unit) { detectTapGestures { } }
-                    // 横向きでカットアウトにパネルが重ならないよう、安全な領域に収める。
-                    .windowInsetsPadding(WindowInsets.displayCutout)
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.displayCutout),
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "明るさ ${(state.brightness * 100).roundToInt()}%",
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = { showInfoDialog = true }) {
-                        Text("i", color = Color.White, style = MaterialTheme.typography.titleLarge)
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(16.dp))
+                        // パネル内の余白などのタップはここで消費し、背面の表示切替に届かせない。
+                        .pointerInput(Unit) { detectTapGestures { } }
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "明るさ ${(state.brightness * 100).roundToInt()}%",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(onClick = { showInfoDialog = true }) {
+                            Text("i", color = Color.White, style = MaterialTheme.typography.titleLarge)
+                        }
                     }
+                    Slider(
+                        value = state.brightness,
+                        onValueChange = { viewModel.onBrightnessChanged(it) },
+                        valueRange = LightUiState.MIN_BRIGHTNESS..LightUiState.MAX_BRIGHTNESS,
+                        colors = SliderDefaults.colors(
+                            thumbColor = Color.White,
+                            activeTrackColor = Color.White,
+                            inactiveTrackColor = Color.White.copy(alpha = 0.4f),
+                        ),
+                    )
                 }
-                Slider(
-                    value = state.brightness,
-                    onValueChange = { viewModel.onBrightnessChanged(it) },
-                    valueRange = LightUiState.MIN_BRIGHTNESS..LightUiState.MAX_BRIGHTNESS,
-                    colors = SliderDefaults.colors(
-                        thumbColor = Color.White,
-                        activeTrackColor = Color.White,
-                        inactiveTrackColor = Color.White.copy(alpha = 0.4f),
-                    ),
-                )
             }
         }
     }
