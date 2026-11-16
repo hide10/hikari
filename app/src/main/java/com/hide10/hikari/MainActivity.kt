@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
@@ -46,13 +48,21 @@ import kotlin.math.roundToInt
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // コンテンツをシステムバー・カットアウトの領域まで広げる。
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         // 表示中は画面を消灯させない。
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        // カットアウト領域まで塗りつぶす（API 30 以上）。
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        // カットアウト領域まで塗りつぶす。
+        val cutoutMode = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ->
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ->
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            else -> null
+        }
+        if (cutoutMode != null) {
             window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                layoutInDisplayCutoutMode = cutoutMode
             }
         }
         hideSystemBars()
@@ -107,6 +117,8 @@ fun HikariScreen(viewModel: LightViewModel = viewModel()) {
                     .fillMaxWidth()
                     .padding(16.dp)
                     .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(16.dp))
+                    // パネル内の余白などのタップはここで消費し、背面の表示切替に届かせない。
+                    .pointerInput(Unit) { detectTapGestures { } }
                     .padding(horizontal = 20.dp, vertical = 12.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
