@@ -1,23 +1,19 @@
-# 光 - 画面を光らせるアプリ
+# 光
 
-スマホの画面全体を、任意の明るさで光らせるだけのシンプルな Android アプリ。
+画面全体を白く光らせるだけの Android アプリ。
 
-KB Code の便利ツール群の1本。アイディアの正本は [kanji-zoom の Issue #6](https://github.com/hide10/kanji-zoom/issues/6)。
+- 下のカードのスイッチで点灯と消灯を切り替え、スライダーで明るさを決める。
+- 明るさはこのアプリの画面にだけ効く。端末の明るさ設定は変えない。
+- 最後に選んだ明るさを次の起動でも使う。起動時は常に点灯する。
+- 表示中は画面が消えない。
+- インターネット権限を持たない。
 
-## 機能
+## ビルド
 
-- **全画面表示** - 画面全体（カットアウト領域を含む）を単色で光らせる
-- **明るさ調整** - スライダーで明るさを調整（アプリ表示中だけ有効で、端末設定は書き換えない）
-- **パネル表示切替** - 画面タップで操作パネルの表示／非表示を切り替え
+JDK 17 と Android SDK（compileSdk 36）を使う。`local.properties` に `sdk.dir` を書いてから実行する。
 
-## 技術スタック
+```sh
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 ./gradlew testDebugUnitTest assembleDebug
+```
 
-| 項目 | 選定 |
-|------|------|
-| 言語 | Kotlin |
-| UI | Jetpack Compose |
-| 最小 SDK | API 26 (Android 8.0) |
-| ターゲット SDK | API 36 (Android 16) |
-| ビルド | Gradle (Kotlin DSL) |
-
-権限は不要で、インターネット通信も行いません。
+APK は `app/build/outputs/apk/debug/app-debug.apk` にできる。
